@@ -59,7 +59,11 @@ class MainActivity : Activity() {
 
         agregarBoton(pantalla, "🛒 Compra en supermercado")
         agregarBoton(pantalla, "💳 Pago de recibos")
-        agregarBoton(pantalla, "📞 Contactar a Don Taxi")
+
+        val contactar = Button(this)
+        contactar.text = "📞 Contactar a Don Taxi"
+        contactar.setOnClickListener { contactarWhatsApp() }
+        pantalla.addView(contactar)
 
         setContentView(pantalla)
     }
@@ -83,7 +87,11 @@ class MainActivity : Activity() {
             val lugarDestino = destino.text.toString().trim()
 
             if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
-                Toast.makeText(this, "Completa origen y destino", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Completa origen y destino",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 val mensaje = """
                     🚕 SOLICITUD DE TAXI - DON TAXI
@@ -138,7 +146,11 @@ class MainActivity : Activity() {
                 fechaViaje.isEmpty() ||
                 horaViaje.isEmpty()
             ) {
-                Toast.makeText(this, "Completa todos los datos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Completa todos los datos",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 val mensaje = """
                     📅 VIAJE PROGRAMADO - DON TAXI
@@ -219,6 +231,12 @@ class MainActivity : Activity() {
         setContentView(pantalla)
     }
 
+    private fun contactarWhatsApp() {
+        val mensaje = "Hola Don Taxi, quiero información sobre sus servicios."
+
+        abrirWhatsApp(mensaje)
+    }
+
     private fun crearPantalla(tituloTexto: String): LinearLayout {
         val pantalla = LinearLayout(this)
         pantalla.orientation = LinearLayout.VERTICAL
@@ -238,7 +256,11 @@ class MainActivity : Activity() {
             val texto = URLEncoder.encode(mensaje, "UTF-8")
             val url = "https://wa.me/$whatsapp?text=$texto"
 
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(url)
+            )
+
             startActivity(intent)
 
         } catch (e: Exception) {
