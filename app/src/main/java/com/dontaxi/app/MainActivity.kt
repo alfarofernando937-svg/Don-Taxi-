@@ -7,7 +7,6 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -20,6 +19,10 @@ class MainActivity : Activity() {
 
     private val whatsapp = "50370838437"
 
+    private val amarillo = Color.rgb(255, 193, 7)
+    private val negro = Color.rgb(20, 20, 20)
+    private val blanco = Color.WHITE
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mostrarMenu()
@@ -29,77 +32,78 @@ class MainActivity : Activity() {
 
         val contenido = LinearLayout(this)
         contenido.orientation = LinearLayout.VERTICAL
-        contenido.setPadding(30, 40, 30, 40)
+        contenido.setPadding(25, 30, 25, 30)
+        contenido.setBackgroundColor(blanco)
 
+        // ENCABEZADO
         val encabezado = LinearLayout(this)
         encabezado.orientation = LinearLayout.VERTICAL
         encabezado.gravity = Gravity.CENTER
-        encabezado.setPadding(0, 0, 0, 30)
+        encabezado.setPadding(10, 25, 10, 30)
+        encabezado.setBackgroundColor(amarillo)
+
+        val icono = TextView(this)
+        icono.text = "🚕"
+        icono.textSize = 55f
+        icono.gravity = Gravity.CENTER
+        encabezado.addView(icono)
 
         val titulo = TextView(this)
-        titulo.text = "🚕 DON TAXI"
-        titulo.textSize = 34f
+        titulo.text = "DON TAXI"
+        titulo.textSize = 36f
         titulo.setTypeface(null, Typeface.BOLD)
         titulo.gravity = Gravity.CENTER
-        titulo.setTextColor(Color.BLACK)
+        titulo.setTextColor(negro)
         encabezado.addView(titulo)
 
-        val subtitulo = TextView(this)
-        subtitulo.text = "Tu taxi de confianza"
-        subtitulo.textSize = 18f
-        subtitulo.gravity = Gravity.CENTER
-        subtitulo.setTextColor(Color.DKGRAY)
-        encabezado.addView(subtitulo)
+        val lema = TextView(this)
+        lema.text = "Llevándote con bien a cada destino"
+        lema.textSize = 17f
+        lema.gravity = Gravity.CENTER
+        lema.setTextColor(negro)
+        encabezado.addView(lema)
 
         contenido.addView(encabezado)
 
-        agregarBotonProfesional(
-            contenido,
-            "🚕  SOLICITAR TAXI"
-        ) {
+        val pregunta = TextView(this)
+        pregunta.text = "¿Qué servicio necesitas?"
+        pregunta.textSize = 20f
+        pregunta.setTypeface(null, Typeface.BOLD)
+        pregunta.gravity = Gravity.CENTER
+        pregunta.setTextColor(negro)
+        pregunta.setPadding(0, 25, 0, 15)
+        contenido.addView(pregunta)
+
+        agregarBoton(contenido, "🚕  SOLICITAR TAXI") {
             mostrarSolicitud()
         }
 
-        agregarBotonProfesional(
-            contenido,
-            "📅  PROGRAMAR VIAJE"
-        ) {
+        agregarBoton(contenido, "📅  PROGRAMAR VIAJE") {
             mostrarProgramarViaje()
         }
 
-        agregarBotonProfesional(
-            contenido,
-            "💰  COTIZAR VIAJE"
-        ) {
+        agregarBoton(contenido, "💰  COTIZAR VIAJE") {
             mostrarCotizacion()
         }
 
-        agregarBotonProfesional(
-            contenido,
-            "🛒  COMPRA EN SUPERMERCADO"
-        ) {
+        agregarBoton(contenido, "🛒  COMPRA EN SUPERMERCADO") {
             mostrarSupermercado()
         }
 
-        agregarBotonProfesional(
-            contenido,
-            "💳  PAGO DE RECIBOS"
-        ) {
+        agregarBoton(contenido, "💳  PAGO DE RECIBOS") {
             mostrarPagoRecibos()
         }
 
-        agregarBotonProfesional(
-            contenido,
-            "📞  CONTACTAR A DON TAXI"
-        ) {
+        agregarBoton(contenido, "📞  CONTACTAR A DON TAXI") {
             contactarWhatsApp()
         }
 
         val pie = TextView(this)
-        pie.text = "\nServicio rápido y confiable"
+        pie.text = "\n🚕 Don Taxi\nLlevándote con bien a cada destino"
         pie.textSize = 14f
         pie.gravity = Gravity.CENTER
-        pie.setTextColor(Color.GRAY)
+        pie.setTextColor(Color.DKGRAY)
+        pie.setPadding(0, 20, 0, 20)
         contenido.addView(pie)
 
         val scroll = ScrollView(this)
@@ -108,7 +112,7 @@ class MainActivity : Activity() {
         setContentView(scroll)
     }
 
-    private fun agregarBotonProfesional(
+    private fun agregarBoton(
         pantalla: LinearLayout,
         texto: String,
         accion: () -> Unit
@@ -119,19 +123,20 @@ class MainActivity : Activity() {
         boton.text = texto
         boton.textSize = 16f
         boton.setTypeface(null, Typeface.BOLD)
-        boton.setTextColor(Color.BLACK)
-        boton.setPadding(10, 20, 10, 20)
-
-        boton.setOnClickListener {
-            accion()
-        }
+        boton.setTextColor(negro)
+        boton.setBackgroundColor(amarillo)
+        boton.setPadding(10, 18, 10, 18)
 
         val parametros = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
-        parametros.setMargins(0, 8, 0, 8)
+        parametros.setMargins(0, 7, 0, 7)
+
+        boton.setOnClickListener {
+            accion()
+        }
 
         pantalla.addView(boton, parametros)
     }
@@ -150,13 +155,14 @@ class MainActivity : Activity() {
 
         val enviar = Button(this)
         enviar.text = "📲 Enviar solicitud por WhatsApp"
+        enviar.setBackgroundColor(amarillo)
 
         enviar.setOnClickListener {
 
-            val lugarOrigen = origen.text.toString().trim()
-            val lugarDestino = destino.text.toString().trim()
+            val o = origen.text.toString().trim()
+            val d = destino.text.toString().trim()
 
-            if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
+            if (o.isEmpty() || d.isEmpty()) {
 
                 Toast.makeText(
                     this,
@@ -170,17 +176,16 @@ class MainActivity : Activity() {
                     🚕 SOLICITUD DE TAXI - DON TAXI
                     
                     📍 Origen:
-                    $lugarOrigen
+                    $o
                     
                     🏁 Destino:
-                    $lugarDestino
+                    $d
                 """.trimIndent())
             }
         }
 
         pantalla.addView(enviar)
-
-        agregarBotonVolver(pantalla)
+        agregarVolver(pantalla)
 
         setContentView(pantalla)
     }
@@ -207,6 +212,7 @@ class MainActivity : Activity() {
 
         val enviar = Button(this)
         enviar.text = "📲 Programar por WhatsApp"
+        enviar.setBackgroundColor(amarillo)
 
         enviar.setOnClickListener {
 
@@ -249,8 +255,7 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
-        agregarBotonVolver(pantalla)
+        agregarVolver(pantalla)
 
         setContentView(pantalla)
     }
@@ -273,6 +278,7 @@ class MainActivity : Activity() {
 
         val enviar = Button(this)
         enviar.text = "📲 Solicitar cotización"
+        enviar.setBackgroundColor(amarillo)
 
         enviar.setOnClickListener {
 
@@ -308,8 +314,7 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
-        agregarBotonVolver(pantalla)
+        agregarVolver(pantalla)
 
         setContentView(pantalla)
     }
@@ -340,19 +345,20 @@ class MainActivity : Activity() {
 
         val enviar = Button(this)
         enviar.text = "📲 Solicitar compra"
+        enviar.setBackgroundColor(amarillo)
 
         enviar.setOnClickListener {
 
             val lista = productos.text.toString().trim()
-            val lugarCompra = supermercado.text.toString().trim()
-            val lugarEntrega = entrega.text.toString().trim()
+            val compra = supermercado.text.toString().trim()
+            val entregaLugar = entrega.text.toString().trim()
             val fechaCompra = fecha.text.toString().trim()
             val info = detalles.text.toString().trim()
 
             if (
                 lista.isEmpty() ||
-                lugarCompra.isEmpty() ||
-                lugarEntrega.isEmpty() ||
+                compra.isEmpty() ||
+                entregaLugar.isEmpty() ||
                 fechaCompra.isEmpty()
             ) {
 
@@ -371,10 +377,10 @@ class MainActivity : Activity() {
                     $lista
                     
                     🏪 Supermercado:
-                    $lugarCompra
+                    $compra
                     
                     📍 Lugar de entrega:
-                    $lugarEntrega
+                    $entregaLugar
                     
                     📅 Fecha:
                     $fechaCompra
@@ -386,8 +392,7 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
-        agregarBotonVolver(pantalla)
+        agregarVolver(pantalla)
 
         setContentView(pantalla)
     }
@@ -418,6 +423,7 @@ class MainActivity : Activity() {
 
         val enviar = Button(this)
         enviar.text = "📲 Solicitar servicio"
+        enviar.setBackgroundColor(amarillo)
 
         enviar.setOnClickListener {
 
@@ -464,8 +470,7 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
-        agregarBotonVolver(pantalla)
+        agregarVolver(pantalla)
 
         setContentView(pantalla)
     }
@@ -484,27 +489,41 @@ class MainActivity : Activity() {
         val pantalla = LinearLayout(this)
 
         pantalla.orientation = LinearLayout.VERTICAL
-        pantalla.setPadding(30, 30, 30, 30)
+        pantalla.setPadding(25, 30, 25, 30)
+        pantalla.setBackgroundColor(Color.WHITE)
+
+        val encabezado = TextView(this)
+
+        encabezado.text = "🚕 DON TAXI"
+        encabezado.textSize = 25f
+        encabezado.setTypeface(null, Typeface.BOLD)
+        encabezado.gravity = Gravity.CENTER
+        encabezado.setTextColor(negro)
+
+        pantalla.addView(encabezado)
 
         val titulo = TextView(this)
 
         titulo.text = tituloTexto
-        titulo.textSize = 28f
-        titulo.gravity = Gravity.CENTER
+        titulo.textSize = 26f
         titulo.setTypeface(null, Typeface.BOLD)
+        titulo.gravity = Gravity.CENTER
+        titulo.setTextColor(negro)
+        titulo.setPadding(0, 25, 0, 20)
 
         pantalla.addView(titulo)
 
         return pantalla
     }
 
-    private fun agregarBotonVolver(
+    private fun agregarVolver(
         pantalla: LinearLayout
     ) {
 
         val volver = Button(this)
 
-        volver.text = "🏠 Volver al inicio"
+        volver.text = "🏠 VOLVER AL INICIO"
+        volver.setBackgroundColor(amarillo)
 
         volver.setOnClickListener {
             mostrarMenu()
