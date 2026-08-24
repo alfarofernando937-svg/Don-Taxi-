@@ -17,4 +17,3 @@ dependencyResolutionManagement {
 rootProject.name = "Don-Taxi"
 
 include(":app")
-configurar gradle
