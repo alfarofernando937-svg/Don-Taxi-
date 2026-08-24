@@ -1,6 +1,8 @@
 package com.dontaxi.app
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.graphics.Color
 import android.view.Gravity
@@ -9,8 +11,11 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import java.net.URLEncoder
 
 class MainActivity : Activity() {
+
+    private val whatsapp = "50370838437"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,24 +76,53 @@ class MainActivity : Activity() {
         pantalla.addView(destino)
 
         val enviar = Button(this)
-        enviar.text = "Enviar solicitud"
+        enviar.text = "📲 Enviar solicitud por WhatsApp"
 
         enviar.setOnClickListener {
 
-            if (origen.text.toString().isBlank() ||
-                destino.text.toString().isBlank()
-            ) {
+            val lugarOrigen = origen.text.toString().trim()
+            val lugarDestino = destino.text.toString().trim()
+
+            if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
+
                 Toast.makeText(
                     this,
                     "Completa origen y destino",
                     Toast.LENGTH_SHORT
                 ).show()
+
             } else {
-                Toast.makeText(
-                    this,
-                    "Solicitud enviada a Don Taxi",
-                    Toast.LENGTH_LONG
-                ).show()
+
+                val mensaje = """
+                    🚕 SOLICITUD DE TAXI - DON TAXI
+                    
+                    📍 Origen:
+                    $lugarOrigen
+                    
+                    🏁 Destino:
+                    $lugarDestino
+                """.trimIndent()
+
+                try {
+                    val texto = URLEncoder.encode(mensaje, "UTF-8")
+
+                    val url = "https://wa.me/$whatsapp?text=$texto"
+
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(url)
+                    )
+
+                    startActivity(intent)
+
+                } catch (e: Exception) {
+
+                    Toast.makeText(
+                        this,
+                        "No se pudo abrir WhatsApp",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
 
@@ -99,18 +133,23 @@ class MainActivity : Activity() {
         volver.setOnClickListener {
             recreate()
         }
+
         pantalla.addView(volver)
 
         setContentView(pantalla)
     }
 
-    private fun agregarBoton(pantalla: LinearLayout, texto: String) {
+    private fun agregarBoton(
+        pantalla: LinearLayout,
+        texto: String
+    ) {
 
         val boton = Button(this)
         boton.text = texto
         boton.textSize = 16f
 
         boton.setOnClickListener {
+
             Toast.makeText(
                 this,
                 "$texto - Próximamente",
