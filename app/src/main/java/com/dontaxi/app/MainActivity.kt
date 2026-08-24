@@ -42,32 +42,12 @@ class MainActivity : Activity() {
         bienvenida.setPadding(0, 30, 0, 30)
         pantalla.addView(bienvenida)
 
-        val solicitar = Button(this)
-        solicitar.text = "🚕 Solicitar taxi"
-        solicitar.setOnClickListener { mostrarSolicitud() }
-        pantalla.addView(solicitar)
-
-        val programar = Button(this)
-        programar.text = "📅 Programar viaje"
-        programar.setOnClickListener { mostrarProgramarViaje() }
-        pantalla.addView(programar)
-
-        val cotizar = Button(this)
-        cotizar.text = "💰 Cotizar viaje"
-        cotizar.setOnClickListener { mostrarCotizacion() }
-        pantalla.addView(cotizar)
-
-        val supermercado = Button(this)
-        supermercado.text = "🛒 Compra en supermercado"
-        supermercado.setOnClickListener { mostrarSupermercado() }
-        pantalla.addView(supermercado)
-
-        agregarBoton(pantalla, "💳 Pago de recibos")
-
-        val contactar = Button(this)
-        contactar.text = "📞 Contactar a Don Taxi"
-        contactar.setOnClickListener { contactarWhatsApp() }
-        pantalla.addView(contactar)
+        agregarBoton(pantalla, "🚕 Solicitar taxi") { mostrarSolicitud() }
+        agregarBoton(pantalla, "📅 Programar viaje") { mostrarProgramarViaje() }
+        agregarBoton(pantalla, "💰 Cotizar viaje") { mostrarCotizacion() }
+        agregarBoton(pantalla, "🛒 Compra en supermercado") { mostrarSupermercado() }
+        agregarBoton(pantalla, "💳 Pago de recibos") { mostrarPagoRecibos() }
+        agregarBoton(pantalla, "📞 Contactar a Don Taxi") { contactarWhatsApp() }
 
         setContentView(pantalla)
     }
@@ -91,13 +71,9 @@ class MainActivity : Activity() {
             val lugarDestino = destino.text.toString().trim()
 
             if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
-                Toast.makeText(
-                    this,
-                    "Completa origen y destino",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Completa origen y destino", Toast.LENGTH_SHORT).show()
             } else {
-                val mensaje = """
+                abrirWhatsApp("""
                     🚕 SOLICITUD DE TAXI - DON TAXI
                     
                     📍 Origen:
@@ -105,9 +81,7 @@ class MainActivity : Activity() {
                     
                     🏁 Destino:
                     $lugarDestino
-                """.trimIndent()
-
-                abrirWhatsApp(mensaje)
+                """.trimIndent())
             }
         }
 
@@ -128,51 +102,40 @@ class MainActivity : Activity() {
         pantalla.addView(destino)
 
         val fecha = EditText(this)
-        fecha.hint = "Fecha del viaje (ej. 25/08/2026)"
+        fecha.hint = "Fecha del viaje"
         pantalla.addView(fecha)
 
         val hora = EditText(this)
-        hora.hint = "Hora del viaje (ej. 8:00 AM)"
+        hora.hint = "Hora del viaje"
         pantalla.addView(hora)
 
         val enviar = Button(this)
         enviar.text = "📲 Programar por WhatsApp"
 
         enviar.setOnClickListener {
-            val lugarOrigen = origen.text.toString().trim()
-            val lugarDestino = destino.text.toString().trim()
-            val fechaViaje = fecha.text.toString().trim()
-            val horaViaje = hora.text.toString().trim()
+            val o = origen.text.toString().trim()
+            val d = destino.text.toString().trim()
+            val f = fecha.text.toString().trim()
+            val h = hora.text.toString().trim()
 
-            if (
-                lugarOrigen.isEmpty() ||
-                lugarDestino.isEmpty() ||
-                fechaViaje.isEmpty() ||
-                horaViaje.isEmpty()
-            ) {
-                Toast.makeText(
-                    this,
-                    "Completa todos los datos",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (o.isEmpty() || d.isEmpty() || f.isEmpty() || h.isEmpty()) {
+                Toast.makeText(this, "Completa todos los datos", Toast.LENGTH_SHORT).show()
             } else {
-                val mensaje = """
+                abrirWhatsApp("""
                     📅 VIAJE PROGRAMADO - DON TAXI
                     
                     📍 Origen:
-                    $lugarOrigen
+                    $o
                     
                     🏁 Destino:
-                    $lugarDestino
+                    $d
                     
                     📅 Fecha:
-                    $fechaViaje
+                    $f
                     
                     🕐 Hora:
-                    $horaViaje
-                """.trimIndent()
-
-                abrirWhatsApp(mensaje)
+                    $h
+                """.trimIndent())
             }
         }
 
@@ -193,40 +156,34 @@ class MainActivity : Activity() {
         pantalla.addView(destino)
 
         val detalles = EditText(this)
-        detalles.hint = "Detalles adicionales (opcional)"
+        detalles.hint = "Detalles adicionales"
         pantalla.addView(detalles)
 
         val enviar = Button(this)
         enviar.text = "📲 Solicitar cotización por WhatsApp"
 
         enviar.setOnClickListener {
-            val lugarOrigen = origen.text.toString().trim()
-            val lugarDestino = destino.text.toString().trim()
-            val informacion = detalles.text.toString().trim()
+            val o = origen.text.toString().trim()
+            val d = destino.text.toString().trim()
+            val info = detalles.text.toString().trim()
 
-            if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
-                Toast.makeText(
-                    this,
-                    "Completa origen y destino",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (o.isEmpty() || d.isEmpty()) {
+                Toast.makeText(this, "Completa origen y destino", Toast.LENGTH_SHORT).show()
             } else {
-                val mensaje = """
+                abrirWhatsApp("""
                     💰 SOLICITUD DE COTIZACIÓN - DON TAXI
                     
                     📍 Origen:
-                    $lugarOrigen
+                    $o
                     
                     🏁 Destino:
-                    $lugarDestino
+                    $d
                     
                     📝 Detalles:
-                    ${if (informacion.isEmpty()) "Sin detalles adicionales" else informacion}
+                    ${if (info.isEmpty()) "Sin detalles adicionales" else info}
                     
                     Por favor, indicar el precio del viaje.
-                """.trimIndent()
-
-                abrirWhatsApp(mensaje)
+                """.trimIndent())
             }
         }
 
@@ -255,7 +212,7 @@ class MainActivity : Activity() {
         pantalla.addView(fecha)
 
         val detalles = EditText(this)
-        detalles.hint = "Detalles adicionales (opcional)"
+        detalles.hint = "Detalles adicionales"
         pantalla.addView(detalles)
 
         val enviar = Button(this)
@@ -266,21 +223,13 @@ class MainActivity : Activity() {
             val lugarCompra = supermercado.text.toString().trim()
             val lugarEntrega = entrega.text.toString().trim()
             val fechaCompra = fecha.text.toString().trim()
-            val informacion = detalles.text.toString().trim()
+            val info = detalles.text.toString().trim()
 
-            if (
-                lista.isEmpty() ||
-                lugarCompra.isEmpty() ||
-                lugarEntrega.isEmpty() ||
-                fechaCompra.isEmpty()
-            ) {
-                Toast.makeText(
-                    this,
-                    "Completa los datos de la compra",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (lista.isEmpty() || lugarCompra.isEmpty() ||
+                lugarEntrega.isEmpty() || fechaCompra.isEmpty()) {
+                Toast.makeText(this, "Completa los datos de la compra", Toast.LENGTH_SHORT).show()
             } else {
-                val mensaje = """
+                abrirWhatsApp("""
                     🛒 SERVICIO DE COMPRA - DON TAXI
                     
                     🛍️ Productos:
@@ -296,10 +245,78 @@ class MainActivity : Activity() {
                     $fechaCompra
                     
                     📝 Detalles:
-                    ${if (informacion.isEmpty()) "Sin detalles adicionales" else informacion}
-                """.trimIndent()
+                    ${if (info.isEmpty()) "Sin detalles adicionales" else info}
+                """.trimIndent())
+            }
+        }
 
-                abrirWhatsApp(mensaje)
+        pantalla.addView(enviar)
+        agregarBotonVolver(pantalla)
+        setContentView(pantalla)
+    }
+
+    private fun mostrarPagoRecibos() {
+        val pantalla = crearPantalla("💳 Pago de recibos")
+
+        val tipo = EditText(this)
+        tipo.hint = "¿Qué recibo deseas pagar?"
+        pantalla.addView(tipo)
+
+        val empresa = EditText(this)
+        empresa.hint = "Empresa o servicio"
+        pantalla.addView(empresa)
+
+        val monto = EditText(this)
+        monto.hint = "Monto aproximado"
+        pantalla.addView(monto)
+
+        val lugar = EditText(this)
+        lugar.hint = "¿Dónde debemos realizar el pago?"
+        pantalla.addView(lugar)
+
+        val detalles = EditText(this)
+        detalles.hint = "Detalles adicionales"
+        pantalla.addView(detalles)
+
+        val enviar = Button(this)
+        enviar.text = "📲 Solicitar servicio por WhatsApp"
+
+        enviar.setOnClickListener {
+            val recibo = tipo.text.toString().trim()
+            val compania = empresa.text.toString().trim()
+            val cantidad = monto.text.toString().trim()
+            val ubicacion = lugar.text.toString().trim()
+            val info = detalles.text.toString().trim()
+
+            if (recibo.isEmpty() || compania.isEmpty() ||
+                cantidad.isEmpty() || ubicacion.isEmpty()) {
+
+                Toast.makeText(
+                    this,
+                    "Completa los datos del recibo",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else {
+
+                abrirWhatsApp("""
+                    💳 SERVICIO DE PAGO DE RECIBO - DON TAXI
+                    
+                    🧾 Recibo:
+                    $recibo
+                    
+                    🏢 Empresa o servicio:
+                    $compania
+                    
+                    💵 Monto aproximado:
+                    $cantidad
+                    
+                    📍 Lugar:
+                    $ubicacion
+                    
+                    📝 Detalles:
+                    ${if (info.isEmpty()) "Sin detalles adicionales" else info}
+                """.trimIndent())
             }
         }
 
@@ -309,8 +326,7 @@ class MainActivity : Activity() {
     }
 
     private fun contactarWhatsApp() {
-        val mensaje = "Hola Don Taxi, quiero información sobre sus servicios."
-        abrirWhatsApp(mensaje)
+        abrirWhatsApp("Hola Don Taxi, quiero información sobre sus servicios.")
     }
 
     private fun crearPantalla(tituloTexto: String): LinearLayout {
@@ -332,12 +348,9 @@ class MainActivity : Activity() {
             val texto = URLEncoder.encode(mensaje, "UTF-8")
             val url = "https://wa.me/$whatsapp?text=$texto"
 
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(url)
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(url))
             )
-
-            startActivity(intent)
 
         } catch (e: Exception) {
             Toast.makeText(
@@ -357,20 +370,13 @@ class MainActivity : Activity() {
 
     private fun agregarBoton(
         pantalla: LinearLayout,
-        texto: String
+        texto: String,
+        accion: () -> Unit
     ) {
         val boton = Button(this)
         boton.text = texto
         boton.textSize = 16f
-
-        boton.setOnClickListener {
-            Toast.makeText(
-                this,
-                "$texto - Próximamente",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
+        boton.setOnClickListener { accion() }
         pantalla.addView(boton)
     }
 }
