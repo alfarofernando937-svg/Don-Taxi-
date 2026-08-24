@@ -57,7 +57,11 @@ class MainActivity : Activity() {
         cotizar.setOnClickListener { mostrarCotizacion() }
         pantalla.addView(cotizar)
 
-        agregarBoton(pantalla, "🛒 Compra en supermercado")
+        val supermercado = Button(this)
+        supermercado.text = "🛒 Compra en supermercado"
+        supermercado.setOnClickListener { mostrarSupermercado() }
+        pantalla.addView(supermercado)
+
         agregarBoton(pantalla, "💳 Pago de recibos")
 
         val contactar = Button(this)
@@ -231,9 +235,81 @@ class MainActivity : Activity() {
         setContentView(pantalla)
     }
 
+    private fun mostrarSupermercado() {
+        val pantalla = crearPantalla("🛒 Compra en supermercado")
+
+        val productos = EditText(this)
+        productos.hint = "¿Qué productos necesitas?"
+        pantalla.addView(productos)
+
+        val supermercado = EditText(this)
+        supermercado.hint = "¿En qué supermercado?"
+        pantalla.addView(supermercado)
+
+        val entrega = EditText(this)
+        entrega.hint = "¿Dónde debemos entregar?"
+        pantalla.addView(entrega)
+
+        val fecha = EditText(this)
+        fecha.hint = "¿Cuándo lo necesitas?"
+        pantalla.addView(fecha)
+
+        val detalles = EditText(this)
+        detalles.hint = "Detalles adicionales (opcional)"
+        pantalla.addView(detalles)
+
+        val enviar = Button(this)
+        enviar.text = "📲 Solicitar compra por WhatsApp"
+
+        enviar.setOnClickListener {
+            val lista = productos.text.toString().trim()
+            val lugarCompra = supermercado.text.toString().trim()
+            val lugarEntrega = entrega.text.toString().trim()
+            val fechaCompra = fecha.text.toString().trim()
+            val informacion = detalles.text.toString().trim()
+
+            if (
+                lista.isEmpty() ||
+                lugarCompra.isEmpty() ||
+                lugarEntrega.isEmpty() ||
+                fechaCompra.isEmpty()
+            ) {
+                Toast.makeText(
+                    this,
+                    "Completa los datos de la compra",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                val mensaje = """
+                    🛒 SERVICIO DE COMPRA - DON TAXI
+                    
+                    🛍️ Productos:
+                    $lista
+                    
+                    🏪 Supermercado:
+                    $lugarCompra
+                    
+                    📍 Lugar de entrega:
+                    $lugarEntrega
+                    
+                    📅 Fecha:
+                    $fechaCompra
+                    
+                    📝 Detalles:
+                    ${if (informacion.isEmpty()) "Sin detalles adicionales" else informacion}
+                """.trimIndent()
+
+                abrirWhatsApp(mensaje)
+            }
+        }
+
+        pantalla.addView(enviar)
+        agregarBotonVolver(pantalla)
+        setContentView(pantalla)
+    }
+
     private fun contactarWhatsApp() {
         val mensaje = "Hola Don Taxi, quiero información sobre sus servicios."
-
         abrirWhatsApp(mensaje)
     }
 
