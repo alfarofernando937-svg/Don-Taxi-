@@ -19,9 +19,18 @@ class MainActivity : Activity() {
 
     private val whatsapp = "50370838437"
 
-    private val amarillo = Color.rgb(255, 193, 7)
-    private val negro = Color.rgb(20, 20, 20)
+    // Colores Don Taxi
+    private val amarillo = Color.rgb(245, 197, 66)
+    private val rojo = Color.rgb(214, 40, 40)
+    private val negro = Color.rgb(17, 17, 17)
     private val blanco = Color.WHITE
+    private val grisSuave = Color.rgb(245, 245, 245)
+
+    // Tipografía moderna
+    private val fuenteModerna = Typeface.create(
+        "sans-serif",
+        Typeface.BOLD
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,77 +41,88 @@ class MainActivity : Activity() {
 
         val contenido = LinearLayout(this)
         contenido.orientation = LinearLayout.VERTICAL
-        contenido.setPadding(25, 30, 25, 30)
+        contenido.setPadding(24, 24, 24, 24)
         contenido.setBackgroundColor(blanco)
 
         // ENCABEZADO
         val encabezado = LinearLayout(this)
         encabezado.orientation = LinearLayout.VERTICAL
         encabezado.gravity = Gravity.CENTER
-        encabezado.setPadding(10, 25, 10, 30)
+        encabezado.setPadding(20, 25, 20, 25)
         encabezado.setBackgroundColor(amarillo)
 
         val icono = TextView(this)
         icono.text = "🚕"
-        icono.textSize = 55f
+        icono.textSize = 52f
         icono.gravity = Gravity.CENTER
         encabezado.addView(icono)
 
         val titulo = TextView(this)
         titulo.text = "DON TAXI"
         titulo.textSize = 36f
-        titulo.setTypeface(null, Typeface.BOLD)
+        titulo.typeface = fuenteModerna
         titulo.gravity = Gravity.CENTER
         titulo.setTextColor(negro)
         encabezado.addView(titulo)
+
+        val linea = TextView(this)
+        linea.text = "━━━━━━━━━━━━━━━━"
+        linea.textSize = 16f
+        linea.gravity = Gravity.CENTER
+        linea.setTextColor(rojo)
+        encabezado.addView(linea)
 
         val lema = TextView(this)
         lema.text = "Llevándote con bien a cada destino"
         lema.textSize = 17f
         lema.gravity = Gravity.CENTER
         lema.setTextColor(negro)
+        lema.setPadding(0, 5, 0, 0)
         encabezado.addView(lema)
 
         contenido.addView(encabezado)
 
         val pregunta = TextView(this)
         pregunta.text = "¿Qué servicio necesitas?"
-        pregunta.textSize = 20f
-        pregunta.setTypeface(null, Typeface.BOLD)
+        pregunta.textSize = 21f
+        pregunta.typeface = fuenteModerna
         pregunta.gravity = Gravity.CENTER
         pregunta.setTextColor(negro)
         pregunta.setPadding(0, 25, 0, 15)
         contenido.addView(pregunta)
 
-        agregarBoton(contenido, "🚕  SOLICITAR TAXI") {
+        // BOTONES
+        agregarBoton(contenido, "🚕  SOLICITAR TAXI", amarillo) {
             mostrarSolicitud()
         }
 
-        agregarBoton(contenido, "📅  PROGRAMAR VIAJE") {
+        agregarBoton(contenido, "📅  PROGRAMAR VIAJE", amarillo) {
             mostrarProgramarViaje()
         }
 
-        agregarBoton(contenido, "💰  COTIZAR VIAJE") {
+        agregarBoton(contenido, "💰  COTIZAR VIAJE", amarillo) {
             mostrarCotizacion()
         }
 
-        agregarBoton(contenido, "🛒  COMPRA EN SUPERMERCADO") {
+        agregarBoton(contenido, "🛒  COMPRA EN SUPERMERCADO", amarillo) {
             mostrarSupermercado()
         }
 
-        agregarBoton(contenido, "💳  PAGO DE RECIBOS") {
+        agregarBoton(contenido, "💳  PAGO DE RECIBOS", amarillo) {
             mostrarPagoRecibos()
         }
 
-        agregarBoton(contenido, "📞  CONTACTAR A DON TAXI") {
+        // Contacto en rojo para destacarlo
+        agregarBoton(contenido, "📞  CONTACTAR A DON TAXI", rojo) {
             contactarWhatsApp()
         }
 
         val pie = TextView(this)
-        pie.text = "\n🚕 Don Taxi\nLlevándote con bien a cada destino"
+        pie.text = "\nDON TAXI\nLlevándote con bien a cada destino"
         pie.textSize = 14f
         pie.gravity = Gravity.CENTER
-        pie.setTextColor(Color.DKGRAY)
+        pie.typeface = fuenteModerna
+        pie.setTextColor(negro)
         pie.setPadding(0, 20, 0, 20)
         contenido.addView(pie)
 
@@ -115,6 +135,7 @@ class MainActivity : Activity() {
     private fun agregarBoton(
         pantalla: LinearLayout,
         texto: String,
+        color: Int,
         accion: () -> Unit
     ) {
 
@@ -122,9 +143,9 @@ class MainActivity : Activity() {
 
         boton.text = texto
         boton.textSize = 16f
-        boton.setTypeface(null, Typeface.BOLD)
+        boton.typeface = fuenteModerna
         boton.setTextColor(negro)
-        boton.setBackgroundColor(amarillo)
+        boton.setBackgroundColor(color)
         boton.setPadding(10, 18, 10, 18)
 
         val parametros = LinearLayout.LayoutParams(
@@ -153,9 +174,9 @@ class MainActivity : Activity() {
         destino.hint = "¿A dónde vas?"
         pantalla.addView(destino)
 
-        val enviar = Button(this)
-        enviar.text = "📲 Enviar solicitud por WhatsApp"
-        enviar.setBackgroundColor(amarillo)
+        val enviar = crearBotonAccion(
+            "📲 ENVIAR SOLICITUD"
+        )
 
         enviar.setOnClickListener {
 
@@ -210,9 +231,9 @@ class MainActivity : Activity() {
         hora.hint = "Hora del viaje"
         pantalla.addView(hora)
 
-        val enviar = Button(this)
-        enviar.text = "📲 Programar por WhatsApp"
-        enviar.setBackgroundColor(amarillo)
+        val enviar = crearBotonAccion(
+            "📲 PROGRAMAR VIAJE"
+        )
 
         enviar.setOnClickListener {
 
@@ -276,9 +297,9 @@ class MainActivity : Activity() {
         detalles.hint = "Detalles adicionales"
         pantalla.addView(detalles)
 
-        val enviar = Button(this)
-        enviar.text = "📲 Solicitar cotización"
-        enviar.setBackgroundColor(amarillo)
+        val enviar = crearBotonAccion(
+            "📲 SOLICITAR COTIZACIÓN"
+        )
 
         enviar.setOnClickListener {
 
@@ -343,9 +364,9 @@ class MainActivity : Activity() {
         detalles.hint = "Detalles adicionales"
         pantalla.addView(detalles)
 
-        val enviar = Button(this)
-        enviar.text = "📲 Solicitar compra"
-        enviar.setBackgroundColor(amarillo)
+        val enviar = crearBotonAccion(
+            "📲 SOLICITAR COMPRA"
+        )
 
         enviar.setOnClickListener {
 
@@ -421,9 +442,9 @@ class MainActivity : Activity() {
         detalles.hint = "Detalles adicionales"
         pantalla.addView(detalles)
 
-        val enviar = Button(this)
-        enviar.text = "📲 Solicitar servicio"
-        enviar.setBackgroundColor(amarillo)
+        val enviar = crearBotonAccion(
+            "📲 SOLICITAR SERVICIO"
+        )
 
         enviar.setOnClickListener {
 
@@ -490,13 +511,13 @@ class MainActivity : Activity() {
 
         pantalla.orientation = LinearLayout.VERTICAL
         pantalla.setPadding(25, 30, 25, 30)
-        pantalla.setBackgroundColor(Color.WHITE)
+        pantalla.setBackgroundColor(blanco)
 
         val encabezado = TextView(this)
 
         encabezado.text = "🚕 DON TAXI"
         encabezado.textSize = 25f
-        encabezado.setTypeface(null, Typeface.BOLD)
+        encabezado.typeface = fuenteModerna
         encabezado.gravity = Gravity.CENTER
         encabezado.setTextColor(negro)
 
@@ -506,7 +527,7 @@ class MainActivity : Activity() {
 
         titulo.text = tituloTexto
         titulo.textSize = 26f
-        titulo.setTypeface(null, Typeface.BOLD)
+        titulo.typeface = fuenteModerna
         titulo.gravity = Gravity.CENTER
         titulo.setTextColor(negro)
         titulo.setPadding(0, 25, 0, 20)
@@ -516,6 +537,22 @@ class MainActivity : Activity() {
         return pantalla
     }
 
+    private fun crearBotonAccion(
+        texto: String
+    ): Button {
+
+        val boton = Button(this)
+
+        boton.text = texto
+        boton.textSize = 16f
+        boton.typeface = fuenteModerna
+        boton.setTextColor(negro)
+        boton.setBackgroundColor(amarillo)
+        boton.setPadding(10, 18, 10, 18)
+
+        return boton
+    }
+
     private fun agregarVolver(
         pantalla: LinearLayout
     ) {
@@ -523,7 +560,10 @@ class MainActivity : Activity() {
         val volver = Button(this)
 
         volver.text = "🏠 VOLVER AL INICIO"
-        volver.setBackgroundColor(amarillo)
+        volver.textSize = 15f
+        volver.typeface = fuenteModerna
+        volver.setTextColor(blanco)
+        volver.setBackgroundColor(rojo)
 
         volver.setOnClickListener {
             mostrarMenu()
