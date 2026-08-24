@@ -19,12 +19,10 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mostrarMenu()
     }
 
     private fun mostrarMenu() {
-
         val pantalla = LinearLayout(this)
         pantalla.orientation = LinearLayout.VERTICAL
         pantalla.gravity = Gravity.CENTER
@@ -46,37 +44,28 @@ class MainActivity : Activity() {
 
         val solicitar = Button(this)
         solicitar.text = "🚕 Solicitar taxi"
-        solicitar.setOnClickListener {
-            mostrarSolicitud()
-        }
+        solicitar.setOnClickListener { mostrarSolicitud() }
         pantalla.addView(solicitar)
 
         val programar = Button(this)
         programar.text = "📅 Programar viaje"
-        programar.setOnClickListener {
-            mostrarProgramarViaje()
-        }
+        programar.setOnClickListener { mostrarProgramarViaje() }
         pantalla.addView(programar)
+
+        val cotizar = Button(this)
+        cotizar.text = "💰 Cotizar viaje"
+        cotizar.setOnClickListener { mostrarCotizacion() }
+        pantalla.addView(cotizar)
 
         agregarBoton(pantalla, "🛒 Compra en supermercado")
         agregarBoton(pantalla, "💳 Pago de recibos")
-        agregarBoton(pantalla, "💰 Cotizar viaje")
         agregarBoton(pantalla, "📞 Contactar a Don Taxi")
 
         setContentView(pantalla)
     }
 
     private fun mostrarSolicitud() {
-
-        val pantalla = LinearLayout(this)
-        pantalla.orientation = LinearLayout.VERTICAL
-        pantalla.setPadding(30, 30, 30, 30)
-
-        val titulo = TextView(this)
-        titulo.text = "🚕 Solicitar taxi"
-        titulo.textSize = 28f
-        titulo.gravity = Gravity.CENTER
-        pantalla.addView(titulo)
+        val pantalla = crearPantalla("🚕 Solicitar taxi")
 
         val origen = EditText(this)
         origen.hint = "¿Dónde te recogemos?"
@@ -90,20 +79,12 @@ class MainActivity : Activity() {
         enviar.text = "📲 Enviar solicitud por WhatsApp"
 
         enviar.setOnClickListener {
-
             val lugarOrigen = origen.text.toString().trim()
             val lugarDestino = destino.text.toString().trim()
 
             if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
-
-                Toast.makeText(
-                    this,
-                    "Completa origen y destino",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(this, "Completa origen y destino", Toast.LENGTH_SHORT).show()
             } else {
-
                 val mensaje = """
                     🚕 SOLICITUD DE TAXI - DON TAXI
                     
@@ -119,23 +100,12 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
         agregarBotonVolver(pantalla)
-
         setContentView(pantalla)
     }
 
     private fun mostrarProgramarViaje() {
-
-        val pantalla = LinearLayout(this)
-        pantalla.orientation = LinearLayout.VERTICAL
-        pantalla.setPadding(30, 30, 30, 30)
-
-        val titulo = TextView(this)
-        titulo.text = "📅 Programar viaje"
-        titulo.textSize = 28f
-        titulo.gravity = Gravity.CENTER
-        pantalla.addView(titulo)
+        val pantalla = crearPantalla("📅 Programar viaje")
 
         val origen = EditText(this)
         origen.hint = "¿Dónde te recogemos?"
@@ -157,7 +127,6 @@ class MainActivity : Activity() {
         enviar.text = "📲 Programar por WhatsApp"
 
         enviar.setOnClickListener {
-
             val lugarOrigen = origen.text.toString().trim()
             val lugarDestino = destino.text.toString().trim()
             val fechaViaje = fecha.text.toString().trim()
@@ -169,15 +138,8 @@ class MainActivity : Activity() {
                 fechaViaje.isEmpty() ||
                 horaViaje.isEmpty()
             ) {
-
-                Toast.makeText(
-                    this,
-                    "Completa todos los datos",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(this, "Completa todos los datos", Toast.LENGTH_SHORT).show()
             } else {
-
                 val mensaje = """
                     📅 VIAJE PROGRAMADO - DON TAXI
                     
@@ -199,32 +161,87 @@ class MainActivity : Activity() {
         }
 
         pantalla.addView(enviar)
-
         agregarBotonVolver(pantalla)
-
         setContentView(pantalla)
     }
 
+    private fun mostrarCotizacion() {
+        val pantalla = crearPantalla("💰 Cotizar viaje")
+
+        val origen = EditText(this)
+        origen.hint = "¿Dónde te recogemos?"
+        pantalla.addView(origen)
+
+        val destino = EditText(this)
+        destino.hint = "¿A dónde vas?"
+        pantalla.addView(destino)
+
+        val detalles = EditText(this)
+        detalles.hint = "Detalles adicionales (opcional)"
+        pantalla.addView(detalles)
+
+        val enviar = Button(this)
+        enviar.text = "📲 Solicitar cotización por WhatsApp"
+
+        enviar.setOnClickListener {
+            val lugarOrigen = origen.text.toString().trim()
+            val lugarDestino = destino.text.toString().trim()
+            val informacion = detalles.text.toString().trim()
+
+            if (lugarOrigen.isEmpty() || lugarDestino.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Completa origen y destino",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                val mensaje = """
+                    💰 SOLICITUD DE COTIZACIÓN - DON TAXI
+                    
+                    📍 Origen:
+                    $lugarOrigen
+                    
+                    🏁 Destino:
+                    $lugarDestino
+                    
+                    📝 Detalles:
+                    ${if (informacion.isEmpty()) "Sin detalles adicionales" else informacion}
+                    
+                    Por favor, indicar el precio del viaje.
+                """.trimIndent()
+
+                abrirWhatsApp(mensaje)
+            }
+        }
+
+        pantalla.addView(enviar)
+        agregarBotonVolver(pantalla)
+        setContentView(pantalla)
+    }
+
+    private fun crearPantalla(tituloTexto: String): LinearLayout {
+        val pantalla = LinearLayout(this)
+        pantalla.orientation = LinearLayout.VERTICAL
+        pantalla.setPadding(30, 30, 30, 30)
+
+        val titulo = TextView(this)
+        titulo.text = tituloTexto
+        titulo.textSize = 28f
+        titulo.gravity = Gravity.CENTER
+        pantalla.addView(titulo)
+
+        return pantalla
+    }
+
     private fun abrirWhatsApp(mensaje: String) {
-
         try {
-
-            val texto = URLEncoder.encode(
-                mensaje,
-                "UTF-8"
-            )
-
+            val texto = URLEncoder.encode(mensaje, "UTF-8")
             val url = "https://wa.me/$whatsapp?text=$texto"
 
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(url)
-            )
-
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
 
         } catch (e: Exception) {
-
             Toast.makeText(
                 this,
                 "No se pudo abrir WhatsApp",
@@ -233,17 +250,10 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun agregarBotonVolver(
-        pantalla: LinearLayout
-    ) {
-
+    private fun agregarBotonVolver(pantalla: LinearLayout) {
         val volver = Button(this)
         volver.text = "Volver"
-
-        volver.setOnClickListener {
-            mostrarMenu()
-        }
-
+        volver.setOnClickListener { mostrarMenu() }
         pantalla.addView(volver)
     }
 
@@ -251,13 +261,11 @@ class MainActivity : Activity() {
         pantalla: LinearLayout,
         texto: String
     ) {
-
         val boton = Button(this)
         boton.text = texto
         boton.textSize = 16f
 
         boton.setOnClickListener {
-
             Toast.makeText(
                 this,
                 "$texto - Próximamente",
