@@ -1,4 +1,4 @@
-name: Build Don Taxi APK
+name: Crear APK Don Taxi
 
 on:
   workflow_dispatch:
@@ -17,10 +17,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Generar Gradle
+        run: gradle wrapper --gradle-version 8.9
+
       - name: Dar permisos a Gradle
         run: chmod +x gradlew
 
-      - name: Compilar APK
+      - name: Crear APK
         run: ./gradlew assembleDebug
 
       - name: Guardar APK
