@@ -1,10 +1,11 @@
 package com.don.taxi.app
 
+import android.app.Activity
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -12,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         val texto = TextView(this)
         texto.text = "DON TAXI\n\nBienvenido"
         texto.textSize = 28f
-        texto.gravity = android.view.Gravity.CENTER
+        texto.gravity = Gravity.CENTER
 
         setContentView(texto)
     }
