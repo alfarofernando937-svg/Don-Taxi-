@@ -21,7 +21,7 @@ class MainActivity : Activity() {
 
     // Colores Don Taxi
     private val amarillo = Color.rgb(245, 197, 66)
-    private val rojo = Color.rgb(214, 40, 40)
+    private val rojo = Color.rgb(239, 154, 154)
     private val negro = Color.rgb(17, 17, 17)
     private val blanco = Color.WHITE
     private val grisSuave = Color.rgb(245, 245, 245)
