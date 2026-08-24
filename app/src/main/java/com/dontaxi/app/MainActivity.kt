@@ -1,4 +1,4 @@
-package com.don.taxi.app
+package com.dontaxi.app
 
 import android.app.Activity
 import android.os.Bundle
