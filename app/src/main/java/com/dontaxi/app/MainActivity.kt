@@ -58,9 +58,10 @@ class MainActivity : AppCompatActivity() {
             mostrarMensaje("Área de cliente")
         }
 
-        conductor.setOnClickListener {
-            mostrarMensaje("Área de conductor")
-        }
+        cliente.setOnClickListener {
+    val intent = android.content.Intent(this, ClienteActivity::class.java)
+    startActivity(intent)
+}
 
         administrador.setOnClickListener {
             mostrarMensaje("Área de administrador")
