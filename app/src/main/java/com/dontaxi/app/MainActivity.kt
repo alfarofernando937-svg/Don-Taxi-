@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -55,30 +56,40 @@ class MainActivity : AppCompatActivity() {
         setContentView(pantalla)
 
         cliente.setOnClickListener {
-            mostrarMensaje("Área de cliente")
+            val intent = android.content.Intent(
+                this,
+                ClienteActivity::class.java
+            )
+            startActivity(intent)
         }
 
-        cliente.setOnClickListener {
-    val intent = android.content.Intent(this, ClienteActivity::class.java)
-    startActivity(intent)
-}
+        conductor.setOnClickListener {
+            val intent = android.content.Intent(
+                this,
+                ConductorActivity::class.java
+            )
+            startActivity(intent)
+        }
 
         administrador.setOnClickListener {
             mostrarMensaje("Área de administrador")
         }
     }
 
-    private fun agregarEspacio(layout: LinearLayout, espacio: Int) {
+    private fun agregarEspacio(
+        layout: LinearLayout,
+        espacio: Int
+    ) {
         val espacioView = TextView(this)
         espacioView.height = espacio
         layout.addView(espacioView)
     }
 
     private fun mostrarMensaje(mensaje: String) {
-        android.widget.Toast.makeText(
+        Toast.makeText(
             this,
             mensaje,
-            android.widget.Toast.LENGTH_SHORT
+            Toast.LENGTH_SHORT
         ).show()
     }
 }
