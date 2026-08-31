@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class ClienteActivity : AppCompatActivity() {
@@ -54,7 +55,11 @@ class ClienteActivity : AppCompatActivity() {
         setContentView(pantalla)
 
         solicitar.setOnClickListener {
-            mostrarMensaje("Solicitar taxi")
+            val intent = android.content.Intent(
+                this,
+                SolicitudTaxiActivity::class.java
+            )
+            startActivity(intent)
         }
 
         programar.setOnClickListener {
@@ -79,10 +84,10 @@ class ClienteActivity : AppCompatActivity() {
     }
 
     private fun mostrarMensaje(mensaje: String) {
-        android.widget.Toast.makeText(
+        Toast.makeText(
             this,
             mensaje,
-            android.widget.Toast.LENGTH_SHORT
+            Toast.LENGTH_SHORT
         ).show()
     }
 }
