@@ -25,6 +25,9 @@
         <activity
             android:name="com.don.taxi.app.ClienteActivity"
             android:exported="false" />
+        <activity
+      android:name="com.don.taxi.app.SolicitudTaxiActivity"
+      android:exported="false" />
 
     </application>
 
