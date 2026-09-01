@@ -30,7 +30,10 @@ class ConductorActivity : AppCompatActivity() {
         titulo.textSize = 28f
         titulo.setTextColor(Color.BLACK)
         titulo.gravity = Gravity.CENTER
-        titulo.setPadding(0, 0, 0, 30)
+        titulo.setPadding(0, 0, 0, 20)
+
+        val ubicacion = Button(this)
+        ubicacion.text = "📍 COMPARTIR MI UBICACIÓN"
 
         lista = LinearLayout(this)
         lista.orientation = LinearLayout.VERTICAL
@@ -39,10 +42,19 @@ class ConductorActivity : AppCompatActivity() {
         volver.text = "🔙 VOLVER"
 
         pantalla.addView(titulo)
+        pantalla.addView(ubicacion)
         pantalla.addView(lista)
         pantalla.addView(volver)
 
         setContentView(pantalla)
+
+        ubicacion.setOnClickListener {
+            val intent = android.content.Intent(
+                this,
+                UbicacionConductorActivity::class.java
+            )
+            startActivity(intent)
+        }
 
         volver.setOnClickListener {
             finish()
@@ -57,13 +69,16 @@ class ConductorActivity : AppCompatActivity() {
             .addSnapshotListener { snapshots, error ->
 
                 if (error != null) {
-                    mostrarMensaje("❌ Error: ${error.message}")
+                    mostrarMensaje(
+                        "❌ Error: ${error.message}"
+                    )
                     return@addSnapshotListener
                 }
 
                 lista.removeAllViews()
 
                 if (snapshots == null || snapshots.isEmpty) {
+
                     val vacio = TextView(this)
                     vacio.text = "No hay solicitudes disponibles"
                     vacio.textSize = 18f
@@ -78,13 +93,16 @@ class ConductorActivity : AppCompatActivity() {
                 for (documento in snapshots.documents) {
 
                     val origen =
-                        documento.getString("origen") ?: "Sin origen"
+                        documento.getString("origen")
+                            ?: "Sin origen"
 
                     val destino =
-                        documento.getString("destino") ?: "Sin destino"
+                        documento.getString("destino")
+                            ?: "Sin destino"
 
                     val estadoOriginal =
-                        documento.getString("estado") ?: "sin estado"
+                        documento.getString("estado")
+                            ?: "sin estado"
 
                     val estado =
                         estadoOriginal.trim().lowercase()
@@ -118,7 +136,8 @@ class ConductorActivity : AppCompatActivity() {
                                 .update("estado", "aceptado")
                                 .addOnSuccessListener {
 
-                                    aceptar.text = "✅ VIAJE ACEPTADO"
+                                    aceptar.text =
+                                        "✅ VIAJE ACEPTADO"
 
                                     mostrarMensaje(
                                         "🚕 Viaje aceptado correctamente"
@@ -127,7 +146,8 @@ class ConductorActivity : AppCompatActivity() {
                                 .addOnFailureListener { e ->
 
                                     aceptar.isEnabled = true
-                                    aceptar.text = "✅ ACEPTAR VIAJE"
+                                    aceptar.text =
+                                        "✅ ACEPTAR VIAJE"
 
                                     mostrarMensaje(
                                         "❌ Error: ${e.message}"
