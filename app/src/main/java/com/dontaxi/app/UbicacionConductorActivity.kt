@@ -10,28 +10,28 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UbicacionConductorActivity : AppCompatActivity() {
 
-    private val db = FirebaseFirestore.getInstance()
-
-    private val clienteUbicacion by lazy {
-        LocationServices.getFusedLocationProviderClient(this)
-    }
-
+    private lateinit var proveedorUbicacion: FusedLocationProviderClient
     private lateinit var estado: TextView
-    private var compartiendo = false
+
+    private val db = FirebaseFirestore.getInstance()
 
     private val callback = object : LocationCallback() {
 
         override fun onLocationResult(resultado: LocationResult) {
 
-            for (ubicacion in resultado.locations) {
+            val ubicacion = resultado.lastLocation
+
+            if (ubicacion != null) {
                 guardarUbicacion(ubicacion)
             }
         }
@@ -39,6 +39,14 @@ class UbicacionConductorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        proveedorUbicacion =
+            LocationServices.getFusedLocationProviderClient(this)
+
+        crearPantalla()
+    }
+
+    private fun crearPantalla() {
 
         val pantalla = LinearLayout(this)
         pantalla.orientation = LinearLayout.VERTICAL
@@ -66,7 +74,7 @@ class UbicacionConductorActivity : AppCompatActivity() {
         setContentView(pantalla)
 
         iniciar.setOnClickListener {
-            iniciarUbicacion()
+            comprobarPermiso()
         }
 
         detener.setOnClickListener {
@@ -78,17 +86,21 @@ class UbicacionConductorActivity : AppCompatActivity() {
         }
     }
 
-    private fun iniciarUbicacion() {
+    private fun comprobarPermiso() {
+
+        val permisoFino = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        val permisoAproximado = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
 
         if (
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            permisoFino != PackageManager.PERMISSION_GRANTED &&
+            permisoAproximado != PackageManager.PERMISSION_GRANTED
         ) {
 
             ActivityCompat.requestPermissions(
@@ -103,38 +115,92 @@ class UbicacionConductorActivity : AppCompatActivity() {
             return
         }
 
-        val solicitud = LocationRequest.Builder(
-            5000
+        iniciarUbicacion()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        resultados: IntArray
+    ) {
+        super.onRequestPermissionsResult(
+            requestCode,
+            permissions,
+            resultados
         )
-            .setMinUpdateIntervalMillis(3000)
+
+        if (requestCode == 100) {
+
+            if (
+                resultados.isNotEmpty() &&
+                resultados.any {
+                    it == PackageManager.PERMISSION_GRANTED
+                }
+            ) {
+                iniciarUbicacion()
+            } else {
+                mostrarMensaje(
+                    "❌ Don Taxi necesita permiso de ubicación"
+                )
+            }
+        }
+    }
+
+    private fun iniciarUbicacion() {
+
+        val permisoFino = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        val permisoAproximado = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        if (
+            permisoFino != PackageManager.PERMISSION_GRANTED &&
+            permisoAproximado != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        val solicitud = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            5000L
+        )
+            .setMinUpdateIntervalMillis(3000L)
             .build()
 
-        clienteUbicacion.requestLocationUpdates(
+        proveedorUbicacion.requestLocationUpdates(
             solicitud,
             callback,
             mainLooper
         )
 
-        compartiendo = true
         estado.text = "🟢 Compartiendo ubicación"
-        mostrarMensaje("📍 Ubicación activada")
+
+        mostrarMensaje(
+            "📍 Ubicación activada"
+        )
     }
 
     private fun detenerUbicacion() {
 
-        clienteUbicacion.removeLocationUpdates(callback)
+        proveedorUbicacion.removeLocationUpdates(
+            callback
+        )
 
-        compartiendo = false
         estado.text = "⛔ Ubicación detenida"
 
-        mostrarMensaje("Ubicación detenida")
+        mostrarMensaje(
+            "Ubicación detenida"
+        )
     }
 
-    private fun guardarUbicacion(ubicacion: Location) {
-
-        if (!compartiendo) {
-            return
-        }
+    private fun guardarUbicacion(
+        ubicacion: Location
+    ) {
 
         val datos = hashMapOf(
             "latitud" to ubicacion.latitude,
@@ -145,14 +211,19 @@ class UbicacionConductorActivity : AppCompatActivity() {
         db.collection("conductores")
             .document("conductor_actual")
             .set(datos)
-            .addOnFailureListener {
-                mostrarMensaje("❌ No se pudo guardar la ubicación")
+            .addOnFailureListener { error ->
+
+                mostrarMensaje(
+                    "❌ Error Firebase: ${error.message}"
+                )
             }
     }
 
     override fun onDestroy() {
 
-        clienteUbicacion.removeLocationUpdates(callback)
+        proveedorUbicacion.removeLocationUpdates(
+            callback
+        )
 
         super.onDestroy()
     }
@@ -162,7 +233,7 @@ class UbicacionConductorActivity : AppCompatActivity() {
         Toast.makeText(
             this,
             mensaje,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
         ).show()
     }
 }
