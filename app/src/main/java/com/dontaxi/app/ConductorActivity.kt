@@ -30,6 +30,7 @@ class ConductorActivity : AppCompatActivity() {
         titulo.textSize = 28f
         titulo.setTextColor(Color.BLACK)
         titulo.gravity = Gravity.CENTER
+        titulo.setPadding(0, 0, 0, 30)
 
         lista = LinearLayout(this)
         lista.orientation = LinearLayout.VERTICAL
@@ -39,7 +40,6 @@ class ConductorActivity : AppCompatActivity() {
 
         pantalla.addView(titulo)
         pantalla.addView(lista)
-
         pantalla.addView(volver)
 
         setContentView(pantalla)
@@ -54,90 +54,82 @@ class ConductorActivity : AppCompatActivity() {
     private fun escucharSolicitudes() {
 
         listener = db.collection("solicitudes")
-            .whereEqualTo("estado", "pendiente")
             .addSnapshotListener { snapshots, error ->
 
                 if (error != null) {
-                    mostrarMensaje("❌ Error al cargar solicitudes")
+                    mostrarMensaje(
+                        "❌ Error: ${error.message}"
+                    )
                     return@addSnapshotListener
                 }
 
                 lista.removeAllViews()
 
                 if (snapshots == null || snapshots.isEmpty) {
-                    val vacio = TextView(this)
-                    vacio.text = "No hay solicitudes pendientes"
-                    vacio.textSize = 18f
-                    vacio.setPadding(10, 30, 10, 30)
-                    lista.addView(vacio)
+                    mostrarMensaje(
+                        "No existen solicitudes en Firebase"
+                    )
                     return@addSnapshotListener
                 }
 
                 for (documento in snapshots.documents) {
 
                     val origen =
-                        documento.getString("origen") ?: "Sin origen"
+                        documento.getString("origen")
+                            ?: "Sin origen"
 
                     val destino =
-                        documento.getString("destino") ?: "Sin destino"
+                        documento.getString("destino")
+                            ?: "Sin destino"
 
-                    val tarjeta = LinearLayout(this)
-                    tarjeta.orientation = LinearLayout.VERTICAL
-                    tarjeta.setPadding(20, 20, 20, 20)
+                    val estado =
+                        documento.getString("estado")
+                            ?: "sin estado"
 
                     val viaje = TextView(this)
+
                     viaje.text =
-                        "📍 Recogida: $origen\n🏁 Destino: $destino"
+                        "📍 Recogida: $origen\n" +
+                        "🏁 Destino: $destino\n" +
+                        "📌 Estado: $estado"
+
                     viaje.textSize = 18f
                     viaje.setTextColor(Color.BLACK)
+                    viaje.setPadding(10, 20, 10, 10)
 
-                    val aceptar = Button(this)
-                    aceptar.text = "✅ ACEPTAR VIAJE"
+                    lista.addView(viaje)
 
-                    tarjeta.addView(viaje)
-                    tarjeta.addView(aceptar)
+                    if (estado == "pendiente") {
 
-                    lista.addView(tarjeta)
+                        val aceptar = Button(this)
+                        aceptar.text = "✅ ACEPTAR VIAJE"
 
-                    aceptar.setOnClickListener {
+                        lista.addView(aceptar)
 
-                        aceptarViaje(
-                            documento.id,
-                            aceptar
-                        )
+                        aceptar.setOnClickListener {
+
+                            documento.reference
+                                .update("estado", "aceptado")
+                                .addOnSuccessListener {
+
+                                    mostrarMensaje(
+                                        "🚕 Viaje aceptado"
+                                    )
+                                }
+                                .addOnFailureListener { e ->
+
+                                    mostrarMensaje(
+                                        "❌ Error: ${e.message}"
+                                    )
+                                }
+                        }
                     }
+
+                    val separador = TextView(this)
+                    separador.text = "━━━━━━━━━━━━━━━━"
+                    separador.gravity = Gravity.CENTER
+                    lista.addView(separador)
                 }
-            }
-    }
-
-    private fun aceptarViaje(
-        idSolicitud: String,
-        boton: Button
-    ) {
-
-        boton.isEnabled = false
-        boton.text = "⏳ ACEPTANDO..."
-
-        db.collection("solicitudes")
-            .document(idSolicitud)
-            .update(
-                "estado",
-                "aceptado"
-            )
-            .addOnSuccessListener {
-
-                mostrarMensaje("🚕 Viaje aceptado")
-
-                boton.text = "✅ VIAJE ACEPTADO"
-            }
-            .addOnFailureListener {
-
-                boton.isEnabled = true
-                boton.text = "✅ ACEPTAR VIAJE"
-
-                mostrarMensaje(
-                    "❌ No se pudo aceptar el viaje"
-                )
             }
     }
 
