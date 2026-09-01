@@ -57,41 +57,44 @@ class ConductorActivity : AppCompatActivity() {
             .addSnapshotListener { snapshots, error ->
 
                 if (error != null) {
-                    mostrarMensaje(
-                        "❌ Error: ${error.message}"
-                    )
+                    mostrarMensaje("❌ Error: ${error.message}")
                     return@addSnapshotListener
                 }
 
                 lista.removeAllViews()
 
                 if (snapshots == null || snapshots.isEmpty) {
-                    mostrarMensaje(
-                        "No existen solicitudes en Firebase"
-                    )
+                    val vacio = TextView(this)
+                    vacio.text = "No hay solicitudes disponibles"
+                    vacio.textSize = 18f
+                    vacio.setTextColor(Color.BLACK)
+                    vacio.gravity = Gravity.CENTER
+                    vacio.setPadding(10, 30, 10, 30)
+
+                    lista.addView(vacio)
                     return@addSnapshotListener
                 }
 
                 for (documento in snapshots.documents) {
 
                     val origen =
-                        documento.getString("origen")
-                            ?: "Sin origen"
+                        documento.getString("origen") ?: "Sin origen"
 
                     val destino =
-                        documento.getString("destino")
-                            ?: "Sin destino"
+                        documento.getString("destino") ?: "Sin destino"
+
+                    val estadoOriginal =
+                        documento.getString("estado") ?: "sin estado"
 
                     val estado =
-                        documento.getString("estado")
-                            ?: "sin estado"
+                        estadoOriginal.trim().lowercase()
 
                     val viaje = TextView(this)
 
                     viaje.text =
                         "📍 Recogida: $origen\n" +
                         "🏁 Destino: $destino\n" +
-                        "📌 Estado: $estado"
+                        "📌 Estado: $estadoOriginal"
 
                     viaje.textSize = 18f
                     viaje.setTextColor(Color.BLACK)
@@ -108,15 +111,23 @@ class ConductorActivity : AppCompatActivity() {
 
                         aceptar.setOnClickListener {
 
+                            aceptar.isEnabled = false
+                            aceptar.text = "⏳ ACEPTANDO..."
+
                             documento.reference
                                 .update("estado", "aceptado")
                                 .addOnSuccessListener {
 
+                                    aceptar.text = "✅ VIAJE ACEPTADO"
+
                                     mostrarMensaje(
-                                        "🚕 Viaje aceptado"
+                                        "🚕 Viaje aceptado correctamente"
                                     )
                                 }
                                 .addOnFailureListener { e ->
+
+                                    aceptar.isEnabled = true
+                                    aceptar.text = "✅ ACEPTAR VIAJE"
 
                                     mostrarMensaje(
                                         "❌ Error: ${e.message}"
@@ -128,6 +139,8 @@ class ConductorActivity : AppCompatActivity() {
                     val separador = TextView(this)
                     separador.text = "━━━━━━━━━━━━━━━━"
                     separador.gravity = Gravity.CENTER
+                    separador.setPadding(0, 10, 0, 10)
+
                     lista.addView(separador)
                 }
             }
@@ -139,6 +152,7 @@ class ConductorActivity : AppCompatActivity() {
     }
 
     private fun mostrarMensaje(mensaje: String) {
+
         Toast.makeText(
             this,
             mensaje,
