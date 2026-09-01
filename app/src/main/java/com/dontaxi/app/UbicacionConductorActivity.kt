@@ -40,10 +40,22 @@ class UbicacionConductorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        proveedorUbicacion =
-            LocationServices.getFusedLocationProviderClient(this)
+        try {
+            proveedorUbicacion =
+                LocationServices.getFusedLocationProviderClient(this)
 
-        crearPantalla()
+            crearPantalla()
+
+        } catch (e: Exception) {
+
+            Toast.makeText(
+                this,
+                "❌ Error al iniciar ubicación: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
+
+            finish()
+        }
     }
 
     private fun crearPantalla() {
@@ -88,34 +100,43 @@ class UbicacionConductorActivity : AppCompatActivity() {
 
     private fun comprobarPermiso() {
 
-        val permisoFino = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
+        try {
 
-        val permisoAproximado = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-        if (
-            permisoFino != PackageManager.PERMISSION_GRANTED &&
-            permisoAproximado != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            ActivityCompat.requestPermissions(
+            val permisoFino = ActivityCompat.checkSelfPermission(
                 this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                100
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
 
-            return
-        }
+            val permisoAproximado = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
 
-        iniciarUbicacion()
+            if (
+                permisoFino != PackageManager.PERMISSION_GRANTED &&
+                permisoAproximado != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
+                    100
+                )
+
+                return
+            }
+
+            iniciarUbicacion()
+
+        } catch (e: Exception) {
+
+            mostrarMensaje(
+                "❌ Error de permisos: ${e.message}"
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -137,8 +158,11 @@ class UbicacionConductorActivity : AppCompatActivity() {
                     it == PackageManager.PERMISSION_GRANTED
                 }
             ) {
+
                 iniciarUbicacion()
+
             } else {
+
                 mostrarMensaje(
                     "❌ Don Taxi necesita permiso de ubicación"
                 )
@@ -148,54 +172,83 @@ class UbicacionConductorActivity : AppCompatActivity() {
 
     private fun iniciarUbicacion() {
 
-        val permisoFino = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
+        try {
 
-        val permisoAproximado = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+            val permisoFino = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
 
-        if (
-            permisoFino != PackageManager.PERMISSION_GRANTED &&
-            permisoAproximado != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
+            val permisoAproximado = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+
+            if (
+                permisoFino != PackageManager.PERMISSION_GRANTED &&
+                permisoAproximado != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                mostrarMensaje(
+                    "❌ No tenemos permiso de ubicación"
+                )
+
+                return
+            }
+
+            val solicitud = LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                5000L
+            )
+                .setMinUpdateIntervalMillis(3000L)
+                .build()
+
+            proveedorUbicacion.requestLocationUpdates(
+                solicitud,
+                callback,
+                mainLooper
+            )
+
+            estado.text = "🟢 Compartiendo ubicación"
+
+            mostrarMensaje(
+                "📍 Ubicación activada"
+            )
+
+        } catch (e: SecurityException) {
+
+            mostrarMensaje(
+                "❌ Android bloqueó el GPS: ${e.message}"
+            )
+
+        } catch (e: Exception) {
+
+            mostrarMensaje(
+                "❌ Error al iniciar GPS: ${e.message}"
+            )
         }
-
-        val solicitud = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            5000L
-        )
-            .setMinUpdateIntervalMillis(3000L)
-            .build()
-
-        proveedorUbicacion.requestLocationUpdates(
-            solicitud,
-            callback,
-            mainLooper
-        )
-
-        estado.text = "🟢 Compartiendo ubicación"
-
-        mostrarMensaje(
-            "📍 Ubicación activada"
-        )
     }
 
     private fun detenerUbicacion() {
 
-        proveedorUbicacion.removeLocationUpdates(
-            callback
-        )
+        try {
 
-        estado.text = "⛔ Ubicación detenida"
+            proveedorUbicacion.removeLocationUpdates(
+                callback
+            )
 
-        mostrarMensaje(
-            "Ubicación detenida"
-        )
+            estado.text = "⛔ Ubicación detenida"
+
+            mostrarMensaje(
+                "Ubicación detenida"
+            )
+
+        } catch (e: Exception) {
+
+            mostrarMensaje(
+                "❌ Error: ${e.message}"
+            )
+        }
     }
 
     private fun guardarUbicacion(
@@ -221,9 +274,10 @@ class UbicacionConductorActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        proveedorUbicacion.removeLocationUpdates(
-            callback
-        )
+        try {
+            proveedorUbicacion.removeLocationUpdates(callback)
+        } catch (_: Exception) {
+        }
 
         super.onDestroy()
     }
