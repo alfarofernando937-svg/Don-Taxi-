@@ -54,7 +54,7 @@ class UbicacionConductorActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
 
-            finish()
+            return
         }
     }
 
